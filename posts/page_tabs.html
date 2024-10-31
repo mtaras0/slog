@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neurotext Processing</title>
+    <style>
+        body { 
+            font-family: serif;
+            line-height: 1.4;
+            font-size: 18px;
+            padding: 0 20px;
+            margin: 20px auto;
+            max-width: 650px;
+            color-scheme: light dark;
+            background-color: color-mix(in srgb, Canvas, CanvasText 2.5%);
+            color: color-mix(in srgb, CanvasText, Canvas 15%);
+        }
+        #semantic-graph {
+            font-family: monospace;
+            font-size: 9px;
+            background-color: color-mix(in srgb, Canvas, CanvasText 15%);; 
+            padding: 10px; 
+            border: 1px solid;
+        }
+        #selectors {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        select {
+            width: 100px;
+            font-size: 18px;
+            font-family: serif;
+        }
+        button {
+            font-size: 18px;
+            font-family: serif;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="semantic-graph">
+        Window management > encompasses > (task management, window arrangement, app switching). Window management > applies to > (desktop OS, mobile OS, browsers). Task switching > goal > efficient workflow. Text-based computers > limited to > single foreground task. Splitting windows > offered > limited multitasking. Splitting windows > didn't allow > window overlap. Tiling window managers > automate > window layout. Tiling window managers > struggle with > many windows. Many windows > lead to > (smaller windows, reduced usability). Author > dislikes > small windows. User > may not want > all tasks visible. Overlapping windows > mechanism > hiding background tasks. Overlapping windows > illustrated by > (file manager and chat window interaction, drag and drop). Overlapping windows > enables > simultaneous access. Overlapping windows > creates > visual clutter. Overlapping windows > reduces > visibility of background windows. Author > questions > overlapping windows' purpose. Author > prefers > (single active window, multiple tiled windows). Overlapping windows > derived from > skeuomorphism. Skeuomorphism > mimics > real-world document interaction. Modern OS > capable of > dynamic window management. Author > believes > overlapping windows outdated. Mobile OS > prioritizes > single full-screen app. Mobile OS > offers > task switching UI. Task switching UI > includes > (recent apps list, app icons). Recent apps list > shows > app previews. Recent apps list > more informative than > app icons. OS > kills background apps > to save resources. Recent apps list > accuracy affected by > background app termination. Recent apps list > sometimes functions as > app launcher. Mobile OS > core concept > correct. Mobile OS > implementation > needs refinement. Mobile OS > features > (picture-in-picture, split screen). Picture-in-picture > allows > floating video. Split screen > enables > multitasking on mobile. Split screen > not universally available > on mobile devices. Mobile OS > task switching > less efficient than desktop. Desktop OS > enables > quick task switching via taskbar. Taskbar > facilitates > one-click switching. Taskbar > utilizes > overlapping windows. Mobile OS > cleaner UI > than desktop. Author > prefers > clean UI. Ideal system > maintains > list of running apps. List of running apps > always visible > (on screen edge, bottom, side). Clicking app in list > brings to foreground, minimizes others. Ideal system > supports > (split view, floating windows). Split view > allows > simultaneous work on multiple apps. Floating windows > enable > temporary overlay. Browser tabs > exemplify > ideal system. Browser tabs > manage > (web pages, web apps). Browser tabs > limited to > web content. Ideal system > should handle > all apps. Stage Manager > implements > ideal system principles. Stage Manager > displays > list of windows. Stage Manager > supports > (window grouping, window snapping). Stage Manager > lacks > true floating windows. Stage Manager > workaround for floating windows > assigning window to all desktops. All-desktops window > behaves like > background floating window. Author > desires > foreground floating windows. Author > believes > all OS should adopt ideal system. Ideal system > applicable to > (desktop, mobile, tablet). Linux taskbar > similar to > ideal system. Chrome OS > could benefit from > ideal system. Chrome OS > hesitant to adopt > due to potential user confusion. Author > believes > Chrome OS as browser with app integration > would be intuitive. Author > envisions > unified app and web page management.
+    </div>
+
+    <br>
+
+    <div id="selectors">
+        <select id="type" size="3">
+            <option value="extremelly short summary">Summary</option>
+            <option value="short blog post" selected>Blog post</option>
+            <option value="extremelly long and detailed article">Article</option>
+        </select>
+        <select id="tone" size="3">
+            <option value="fun">Fun</option>
+            <option value="regular" selected>Regular</option>
+            <option value="academic">Academic</option>
+        </select>
+        <select id="lang" size="3">
+            <option value="Русский">Русский</option>
+            <option value="English" selected>English</option>
+            <option style="font-size: 11pt;" value="日本語">日本語</option>
+        </select>
+
+        <button id="generate-button" onclick="processText()">Generate</button>
+        <span id="generate-timer" style="display: none;">15</span>
+        <script>
+            let timer = 15;
+            let timerIntervalId = null;
+            function startTimer() {
+                timerIntervalId = setInterval(() => {
+                    if (timer > 0) {
+                        document.getElementById('generate-timer').innerText = timer;
+                        timer--;
+                    } else {
+                        clearInterval(timerIntervalId);
+                        timerIntervalId = null;
+                        timer = 15;
+                        document.getElementById('generate-button').disabled = false;
+                        document.getElementById('generate-timer').style.display = 'none';
+                    }
+                }, 1000);
+                document.getElementById('generate-button').disabled = true;
+                document.getElementById('generate-timer').style.display = 'inline';
+            }
+            document.getElementById('generate-button').addEventListener('click', startTimer);
+        </script>
+        
+    </div>
+    <br>
+
+    <div id="loading" style="display: none;">Processing, please wait...</div>
+
+    <div id="output""></div>
+
+    <script>
+        async function processText() {
+            const semanticGraph = document.getElementById('semantic-graph').innerText;
+            const outputElement = document.getElementById('output');
+            const loadingElement = document.getElementById('loading');
+            
+            // Get selected values
+            const type = document.getElementById('type').value;
+            const tone = document.getElementById('tone').value;
+            const lang = document.getElementById('lang').value;
+
+            // Show loading indicator
+            loadingElement.style.display = 'block';
+
+            const prompt = semanticGraph + "\n\n\nThis semantic graph represents a complete thought structure where every connection and fact is explicitly defined - use only what's shown, without adding new information. You can reorder elements for better flow and selectively omit less important details if needed, but you must ensure the final content stays true to what's in the graph. Most importantly, your output must precisely match the requested characteristics. Do not refer to author, write from the first person POV.\n\nFormat using HTML tags. Output inner HTML content only, no DOCTYPE, no markdown, no wrapper tags, no codeblock wrappers.\n\nFrom this graph, create a " + type + " with a title, written in a " + tone + " tone, in " + lang + " language";
+
+            try {
+                // Send request to the backend
+                const response = await fetch('https://us-central1-neuroblog-440208.cloudfunctions.net/neuroblog-generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt: prompt })
+                })
+
+                if (!response.ok) {
+                    throw new Error('Failed to process text');
+                }
+
+                const result = await response.json();
+                
+                // Update the output area
+                outputElement.innerHTML = result.output || 'No output received';
+                
+            } catch (error) {
+                outputElement.innerHTML = 'Error: ' + error.message;
+            } finally {
+                // Hide loading indicator
+                loadingElement.style.display = 'none';
+            }
+        }
+    </script>
+
+</body>
+</html>
